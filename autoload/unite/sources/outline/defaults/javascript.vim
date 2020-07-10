@@ -63,6 +63,16 @@ let s:outline_info = {
       \}
 
 function! s:outline_info.create_heading(which, heading_line, matched_line, context) abort
+
+  if a:heading_line =~ "^import"
+    return {}
+  endif
+  " const { components, commands } = hoge;
+  if a:heading_line =~# '\s\+const\s\+{.*}\s\+=\s\+'
+    return {}
+  endif
+
+
   let h_lnum = a:context.heading_lnum
   " Level 1 to 3 are reserved for comment headings.
   let level = s:Util.get_indent_level(a:context, h_lnum) + 3

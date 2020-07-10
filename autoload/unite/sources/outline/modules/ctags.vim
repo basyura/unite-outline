@@ -100,11 +100,15 @@ call s:Ctags.function('exists')
 function! s:Ctags_supports(filetype) abort
   if !has_key(s:Ctags.lang_info, a:filetype)
     return 0
-  else
-    let lang_info = s:Ctags.lang_info[a:filetype]
-    let ctags_out = unite#util#system(s:Ctags.exe . ' --list-languages')
-    return index(split(ctags_out, "\<NL>"), lang_info.name, 1) >= 0
   endif
+
+  if !exists('s:ctags_out')
+    let list = unite#util#system(s:Ctags.exe . ' --list-languages')
+    let s:ctags_out = map(split(list, "\<NL>"), {idx, val -> tolower(val)})
+  end
+
+  let lang_info = s:Ctags.lang_info[a:filetype]
+  return index(s:ctags_out, tolower(lang_info.name), 1) >= 0
 endfunction
 call s:Ctags.function('supports')
 
