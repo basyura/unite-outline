@@ -37,7 +37,8 @@ let s:pat_rvalue = '\(function\s*(\([^)]*\))\|(\(.*\))\s*{\|\s*{\|\(\w\+\)\s*(\(
 
 let s:pat_def =  '\%(\%(export\s\+\%(default\s\+\)\=\)\=function\>\)'
 
-let s:pat_es6_class = '^\s*\%(export\s\+\%(default\s\+\)\=\)\=class\s\+\(\S\+\)\s*{$'
+"let s:pat_es6_class = '^\s*\%(export\s\+\%(default\s\+\)\=\)\=class\s\+\(\S\+\)\s*{$'
+let s:pat_es6_class = '^\s*\%(export\s\+\%(default\s\+\)\=\)\=class\s\+\(\S\+\)\s.*{$'
 " NOTE: This sub pattern contains 1 capture;  1:className
 
 let s:pat_es6_method = '^\s*\(\%(static\s\+\)\?\w\+\)\s*(\([^)]*\))\s*{$'
@@ -48,7 +49,7 @@ let s:pat_es6_method = '^\s*\(\%(static\s\+\)\?\w\+\)\s*(\([^)]*\))\s*{$'
 
 let s:outline_info = {
       \ 'heading-1': s:Util.shared_pattern('cpp', 'heading-1'),
-      \ 'heading'  : '^\s*\%(' . s:pat_def . '\|' .
+      \ 'heading'  : '^\s*\%(' . s:pat_def . '\|.*class\s.*{\|' .
       \   '\%(' .
       \     '\%(export\s\+\%(default\s\+\)\=\)\=class\s\+\(\S\+\)\s\+\%(extends\s\+\w\+\)\?\|\s*\%(static\s\+\)\?\w\+\s*\|' . s:pat_assign . '\|' . s:pat_label .
       \   '\)\s*' . s:pat_rvalue . '\)',
@@ -69,6 +70,10 @@ function! s:outline_info.create_heading(which, heading_line, matched_line, conte
   endif
   " const { components, commands } = hoge;
   if a:heading_line =~# '\s\+const\s\+{.*}\s\+=\s\+'
+    return {}
+  endif
+  " if (!text.startsWith("#")) {
+  if a:heading_line =~# '\s\+if\s\+'
     return {}
   endif
 
